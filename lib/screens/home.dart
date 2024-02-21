@@ -19,6 +19,7 @@ class _HomeState extends State<Home> {
   final TextEditingController todoController = TextEditingController();
   String selectedFilter = 'All';
   final List<String> filters = ['All', 'Today', 'Upcoming'];
+  final bool _showAddButton = true;
 
   @override
   void initState() {
@@ -33,120 +34,121 @@ class _HomeState extends State<Home> {
       appBar: _buildAppBar(),
       body: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            child: Column(
-              children: [
-                searchBox(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 50, bottom: 20),
-                            child: Text(
-                              "To do list",
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+          SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              child: Column(
+                children: [
+                  searchBox(),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "To do list",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
                           ),
-                          Container(
-                            margin: const EdgeInsets.only(
-                                top: 50, bottom: 20, left: 120),
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
+                        ),
+                        Container(
+                          //  margin: const EdgeInsets.only(top: 50, bottom: 20),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: DropdownButton<String>(
+                            value: selectedFilter,
+                            alignment: Alignment.center,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedFilter = newValue!;
+                                _filterToDoList(newValue);
+                              });
+                            },
+                            items: filters.map<DropdownMenuItem<String>>(
+                              (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              },
+                            ).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _foundItems.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 150),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.info,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  'Nothing here!',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ],
                             ),
-                            child: DropdownButton<String>(
-                              value: selectedFilter,
-                              alignment: Alignment.center,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedFilter = newValue!;
-                                  _filterToDoList(newValue);
-                                });
-                              },
-                              items: filters.map<DropdownMenuItem<String>>(
-                                (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                },
-                              ).toList(),
-                            ),
                           ),
-                        ],
-                      ),
-                      _foundItems.isEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: EdgeInsets.only(top: 150),
-                                child: Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(
-                                        Icons.info,
-                                        size: 50,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(height: 10),
-                                      Text(
-                                        'Nothing here!',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Expanded(
-                              child: ListView(
-                                children: _foundItems.reversed.map((todo) {
-                                  return TodoItems(
-                                    todo: todo,
-                                    onToDoChanged: _handleToDoChange,
-                                    onDeleteItem: _handleToDoDelete,
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _showAddToDoDialog(context);
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                      const Color.fromARGB(255, 34, 140, 246),
-                    ),
-                  ),
-                  child: const Text(
-                    "+ Add a new task",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
+                        )
+                      : ListView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: _foundItems.reversed.map((todo) {
+                            return TodoItems(
+                              todo: todo,
+                              onToDoChanged: _handleToDoChange,
+                              onDeleteItem: _handleToDoDelete,
+                            );
+                          }).toList(),
+                        ),
+                ],
+              ),
             ),
           ),
+          if (_showAddButton)
+            Container(
+              padding: EdgeInsets.only(bottom: 10),
+              alignment: Alignment.bottomCenter,
+              child: ElevatedButton(
+                onPressed: () {
+                  _showAddToDoDialog(context);
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    const Color.fromARGB(255, 34, 140, 246),
+                  ),
+                ),
+                child: Text(
+                  "+ Add a new task",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -215,6 +217,7 @@ class _HomeState extends State<Home> {
         timestamp: DateTime(selectedDate.year, selectedDate.month,
             selectedDate.day, selectedTime.hour, selectedTime.minute),
       ));
+      _itemFilter("");
     });
     todoController.clear();
   }
@@ -288,7 +291,10 @@ class _HomeState extends State<Home> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: const Text('Add a new task'),
+              title: const Text(
+                'Add a new task',
+                textAlign: TextAlign.center,
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -296,8 +302,10 @@ class _HomeState extends State<Home> {
                     onChanged: (value) {
                       newTask = value;
                     },
-                    decoration:
-                        const InputDecoration(labelText: 'Task description'),
+                    decoration: const InputDecoration(
+                      labelText: 'Task description',
+                      hintText: 'Enter task description',
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Row(
@@ -340,7 +348,6 @@ class _HomeState extends State<Home> {
                             context: context,
                             initialTime: selectedTime,
                           );
-                          //  print(selectedTime);
                           if (pickedTime != null &&
                               pickedTime != selectedTime) {
                             setState(() {
@@ -375,8 +382,16 @@ class _HomeState extends State<Home> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    _addToDoItem(newTask, selectedDate, selectedTime);
-                    Navigator.of(context).pop();
+                    if (newTask.isNotEmpty) {
+                      _addToDoItem(newTask, selectedDate, selectedTime);
+                      Navigator.of(context).pop();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Task description cannot be empty'),
+                        ),
+                      );
+                    }
                   },
                   child: const Text('Add task'),
                 ),

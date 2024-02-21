@@ -43,20 +43,6 @@ class ToDo {
         dateTime: DateTime.now(),
         timestamp: DateTime.now(),
       ),
-      ToDo(
-        id: '05',
-        todoText: "Working",
-        isDone: true,
-        dateTime: DateTime.now(),
-        timestamp: DateTime.now(),
-      ),
-      ToDo(
-        id: '06',
-        todoText: "Dinner",
-        isDone: true,
-        dateTime: DateTime.now(),
-        timestamp: DateTime.now(),
-      ),
     ];
   }
 }
