@@ -1,5 +1,5 @@
 
-Readme
+#Readme
 Description
 This mobile application is designed to assist users in managing their schedules by providing features to set reminders, schedule events, and manage time efficiently. The app is built using Flutter framework, making it compatible with both Android and iOS platforms.
 
