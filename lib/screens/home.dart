@@ -5,9 +5,11 @@ import 'package:flutter_todo_app/constants/color.dart';
 import '../widgets/todo_items.dart';
 import '../models/items.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_todo_app/widgets/local_noti.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  final String? payload;
+  const Home({Key? key, this.payload}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -220,6 +222,14 @@ class _HomeState extends State<Home> {
       _itemFilter("");
     });
     todoController.clear();
+
+    LocalNotifications.showNotification(
+      title: toDo,
+      body: "Your task is due soon!",
+      payload: "This is schedule data",
+      scheduledDate: DateTime(selectedDate.year, selectedDate.month,
+          selectedDate.day, selectedTime.hour, selectedTime.minute),
+    );
   }
 
   void _handleToDoDelete(String id) {
@@ -285,6 +295,8 @@ class _HomeState extends State<Home> {
     String pickedDateText = 'Pick a date';
     String pickedTimeText = 'Pick a time';
 
+    final screenWidth = MediaQuery.of(context).size.width;
+
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -295,83 +307,90 @@ class _HomeState extends State<Home> {
                 'Add a new task',
                 textAlign: TextAlign.center,
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextField(
-                    onChanged: (value) {
-                      newTask = value;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Task description',
-                      hintText: 'Enter task description',
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () async {
-                          final DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate,
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2101),
-                          );
-                          if (pickedDate != null &&
-                              pickedDate != selectedDate) {
-                            setState(() {
-                              selectedDate = pickedDate;
-                              pickedDateText =
-                                  DateFormat('dd/MM/yyyy').format(pickedDate);
-                            });
-                          }
+              content: SingleChildScrollView(
+                // ignore: sized_box_for_whitespace
+                child: Container(
+                  width: screenWidth > 600 ? 400 : null,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextField(
+                        onChanged: (value) {
+                          newTask = value;
                         },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color.fromARGB(255, 246, 246, 246),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.calendar_month),
-                            const SizedBox(width: 5),
-                            Text(pickedDateText),
-                          ],
+                        decoration: const InputDecoration(
+                          labelText: 'Task description',
+                          hintText: 'Enter task description',
                         ),
                       ),
-                      const SizedBox(width: 20),
-                      TextButton(
-                        onPressed: () async {
-                          final TimeOfDay? pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: selectedTime,
-                          );
-                          if (pickedTime != null &&
-                              pickedTime != selectedTime) {
-                            setState(() {
-                              selectedTime = pickedTime;
-                              pickedTimeText = pickedTime.format(context);
-                            });
-                          }
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color.fromARGB(255, 246, 246, 246),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              final DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(2101),
+                              );
+                              if (pickedDate != null &&
+                                  pickedDate != selectedDate) {
+                                setState(() {
+                                  selectedDate = pickedDate;
+                                  pickedDateText = DateFormat('dd/MM/yyyy')
+                                      .format(pickedDate);
+                                });
+                              }
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                const Color.fromARGB(255, 246, 246, 246),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.calendar_month),
+                                const SizedBox(width: 5),
+                                Text(pickedDateText),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.alarm),
-                            const SizedBox(width: 5),
-                            Text(pickedTimeText),
-                          ],
-                        ),
+                          const SizedBox(width: 8.8),
+                          TextButton(
+                            onPressed: () async {
+                              final TimeOfDay? pickedTime =
+                                  await showTimePicker(
+                                context: context,
+                                initialTime: selectedTime,
+                              );
+                              if (pickedTime != null &&
+                                  pickedTime != selectedTime) {
+                                setState(() {
+                                  selectedTime = pickedTime;
+                                  pickedTimeText = pickedTime.format(context);
+                                });
+                              }
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                const Color.fromARGB(255, 246, 246, 246),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.alarm),
+                                const SizedBox(width: 5),
+                                Text(pickedTimeText),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
               actions: <Widget>[
                 TextButton(
@@ -384,13 +403,21 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     if (newTask.isNotEmpty) {
                       _addToDoItem(newTask, selectedDate, selectedTime);
+                      // LocalNotifications.showNotification(
+                      //     title: newTask,
+                      //     body: "This is a Schedule Notification",
+                      //     payload: "This is schedule data");
                       Navigator.of(context).pop();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Task description cannot be empty'),
+                          content: Text(
+                            'Task description cannot be empty',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       );
+                      Navigator.of(context).pop();
                     }
                   },
                   child: const Text('Add task'),
