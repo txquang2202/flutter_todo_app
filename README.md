@@ -34,8 +34,8 @@ To run the application on your local machine or emulator, follow these steps:
 5. Send a notification alert 10 minutes before a TODO is due (Use [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)).
 6. Mark a TODO as completed and remove it from the TODO list.
 
-## Feedback
-If you encounter any issues or have suggestions for improvement, please feel free to open an issue or submit a pull request. Your feedback is highly appreciated!
+## Notice
+If you connecting with a phone, you have to open app setting and turn on notifition manually!!!
 
 ## Contributors
 - Tran Xuan Quang - 20127608
