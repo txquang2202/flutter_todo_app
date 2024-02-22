@@ -35,7 +35,7 @@ To run the application on your local machine or emulator, follow these steps:
 6. Mark a TODO as completed and remove it from the TODO list.
 
 ## Notice
-If you connecting with a phone, you have to open app setting and turn on notifition manually!!!
+If you connecting with a phone, you have to open app setting and turn on notification manually!!!
 
 ## Contributors
 - Tran Xuan Quang - 20127608
